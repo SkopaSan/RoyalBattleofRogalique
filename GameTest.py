@@ -1,6 +1,8 @@
 from game import Game, OutMessage
 from events import DialogMessage
-
+from item import Item
+number_of_tests = 100
+char_class = "Warrior"
 class MyMessageTest:
     def __init__(self, text):
         self.text = text
@@ -68,8 +70,9 @@ class GameManager():
             chat_id = new_message.get_chat_id()
             content = new_message.get_content()
             if player_id['id'] not in self.user_list.keys() and content == '/start':
+
                 # print(
-                #     f"Player: {player_id}, Chat: {chat_id}, Content: {content}")
+                #      f"Player: {player_id}, Chat: {chat_id}, Content: {content}")
                 messages_to_send.append(OutMessage(
                     'Ready Player One', chat_id, player_id))
                 messages_to_send.append(OutMessage(DialogMessage(
@@ -87,7 +90,7 @@ class GameManager():
                     player_game = self.user_list[player_id['id']]
                     game_state = player_game.check_state()
                     # print(
-                    #     f"Player: {player_id}, Chat: {chat_id}, Content: {content}, Game State: {game_state}")
+                    #      f"Player: {player_id}, Chat: {chat_id}, Content: {content}, Game State: {game_state}")
                     if game_state == 'Game Start':
                         player_game.game_start(content)
                     elif game_state == 'Base':
@@ -109,37 +112,74 @@ def main():
     game_manager = GameManager()
     text = "/start"
     replays = game_manager.generate_replays(text)
-    #print(replays[0].text)
+    print(replays[0].text)
     lvllist = []
-    for _ in range(1000):
-        text = "Warrior"
+    for _ in range(number_of_tests):
+        text = char_class
         replays = game_manager.generate_replays(text)
-        #print(replays[0].text)
+        print(replays[0].text)
 
         game = game_manager.user_list[1]
         count = 0
         while game.get_playerchar().is_alive():
             #text = input()
-            # replays = game_manager.generate_replays(text)
-            # print(replays[0].text)
-            # game = game_manager.user_list[1]
-            # print(game._game_state)
+            replays = game_manager.generate_replays(text)
+            print(replays[0].text)
+            game = game_manager.user_list[1]
+            print(game._game_state)
             game = game_manager.user_list[1]
             if game._game_state == "Base":
+                if game.get_playerchar().get_current_hp() < game.get_playerchar().get_maxhp() and game.get_playerchar().get_gold() > 10:
+                    text = "B"
+                    replays = game_manager.generate_replays(text)
+                    print(replays[0].text)
+                    while game.get_playerchar().get_gold() > 20:
+                        text = "P"
+                        replays = game_manager.generate_replays(text)
+                        print(replays[0].text)
+                    text = "E"
+                    replays = game_manager.generate_replays(text)
+                    print(replays[0].text)
                 text = "Y"
             elif game._game_state == "Battle Choice":
                 text = "Y"
             elif game._game_state == "Item Choice":
-                text = "E"
+                bonus_atk = game.item.get_bonus_attack()
+                current_atk = game.item._bonus_attack
+                bonus_def = game.item.get_bonus_defence()
+                current_def = game.item._bonus_defence
+                print("ATTAK_BONUS= ",bonus_atk)
+                print("CURRENT ATTACK= ", current_atk)
+                print(current_atk - bonus_atk)
+                print(current_def - bonus_def)
+                if (current_atk - bonus_atk) < 0 or (current_def - bonus_def) < 0:
+                    text = "N"
+                    print("ШМОТ ГОВНО!")
+                    print("ШМОТ ГОВНО!")
+                    print("ШМОТ ГОВНО!")
+                    print("ШМОТ ГОВНО!")
+                    print("ШМОТ ГОВНО!")
+
+                else:
+                    text = "E"
+                    print("Отличный шмот!")
+                    print("Отличный шмот!")
+                    print("Отличный шмот!")
+                    print("Отличный шмот!")
+                    print("Отличный шмот!")
+                    print("Отличный шмот!")
+
             replays = game_manager.generate_replays(text)
-            #print(replays[0].text)
+            print(replays[0].text)
+            HP = game.get_playerchar().get_current_hp()
+            print("HP = ",  HP)
             count += 1
             lvl = game.get_playerchar().get_lvl()
         #print(count)
         lvllist.append(lvl)
     print(lvllist)
     print(max(lvllist))
-    print(sum(lvllist)/1000)
+    print(sum(lvllist)/number_of_tests)
     #print(max(lvllist))
 if __name__ == '__main__':
     main()
