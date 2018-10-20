@@ -1,7 +1,7 @@
 from game import Game, OutMessage
 from events import DialogMessage
 from item import Item
-number_of_tests = 100
+number_of_tests = 1000
 char_class = "Warrior"
 class MyMessageTest:
     def __init__(self, text):
@@ -144,30 +144,57 @@ def main():
             elif game._game_state == "Battle Choice":
                 text = "Y"
             elif game._game_state == "Item Choice":
-                bonus_atk = game.item.get_bonus_attack()
-                current_atk = game.item._bonus_attack
-                bonus_def = game.item.get_bonus_defence()
-                current_def = game.item._bonus_defence
-                print("ATTAK_BONUS= ",bonus_atk)
-                print("CURRENT ATTACK= ", current_atk)
-                print(current_atk - bonus_atk)
-                print(current_def - bonus_def)
-                if (current_atk - bonus_atk) < 0 or (current_def - bonus_def) < 0:
-                    text = "N"
-                    print("ШМОТ ГОВНО!")
-                    print("ШМОТ ГОВНО!")
-                    print("ШМОТ ГОВНО!")
-                    print("ШМОТ ГОВНО!")
-                    print("ШМОТ ГОВНО!")
 
-                else:
-                    text = "E"
-                    print("Отличный шмот!")
-                    print("Отличный шмот!")
-                    print("Отличный шмот!")
-                    print("Отличный шмот!")
-                    print("Отличный шмот!")
-                    print("Отличный шмот!")
+                text = "E"
+                #playeritem = game.playerchar.get_inventory()[game.item.get_type()]
+                print(game.item.get_bonus_attack())
+                item = game.playerchar.get_inventory()[game.item.get_type()]
+                if item is not None:
+                    char_item = game.playerchar.get_inventory()[game.item.get_type()]
+                    print(char_item.get_bonus_attack())
+                    compare_atk = game.item.get_bonus_attack()- char_item.get_bonus_attack()
+                    compare_def = game.item.get_bonus_defence()- char_item.get_bonus_defence()
+                    compare_hp = game.item.get_bonus_hp()- char_item.get_bonus_hp()
+                    compare_mp = game.item.get_bonus_mp()- char_item.get_bonus_mp()
+                    print(compare_atk," ",compare_def," ",compare_hp," ",compare_mp)
+                    if compare_atk < 0 or compare_def < 0:
+                        text = "N"
+                    else:
+                        text = "E"
+                    print(replays[0].text)
+                # replays = game_manager.generate_replays(text)
+                # text = "Y"
+                #print(game.playerchar.get_inventory()[game.item.get_type()])
+                #print(game.item.get_compare_stats(playeritem))
+                # item_stat = game.playerchar.get_inventory()[game.item.get_type()]
+                # if item_stat != "None":
+                #     print(item_stat.get_bonus_attack())
+                #if playeritem:
+                #print("RAZNICA DPS= ", game.item.get_bonus_attack() - playeritem.get_bonus_attack())
+                # bonus_atk = game.item.get_bonus_attack()
+                # current_atk = game.playerchar._attack_item_bonus.
+                # bonus_def = game.item.get_bonus_defence()
+                # current_def = game.playerchar._armour_item_bonus
+                # print("ATTAK_BONUS= ",bonus_atk)
+                # print("CURRENT ATTACK= ", current_atk)
+                # print(current_atk - bonus_atk)
+                # print(current_def - bonus_def)
+                # if (current_atk - bonus_atk) < 0 or (current_def - bonus_def) < 0:
+                #     text = "N"
+                #     print("ШМОТ ГОВНО!")
+                #     print("ШМОТ ГОВНО!")
+                #     print("ШМОТ ГОВНО!")
+                #     print("ШМОТ ГОВНО!")
+                #     print("ШМОТ ГОВНО!")
+                #
+                # else:
+                #     text = "E"
+                #     print("Отличный шмот!")
+                #     print("Отличный шмот!")
+                #     print("Отличный шмот!")
+                #     print("Отличный шмот!")
+                #     print("Отличный шмот!")
+                #     print("Отличный шмот!")
 
             replays = game_manager.generate_replays(text)
             print(replays[0].text)
@@ -183,3 +210,4 @@ def main():
     #print(max(lvllist))
 if __name__ == '__main__':
     main()
+
