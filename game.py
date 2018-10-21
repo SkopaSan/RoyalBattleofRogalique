@@ -404,17 +404,17 @@ class Game:
 # TODO: item sets
 # TODO: initiative
 
-from save import RedisConnection, REDIS_URL
+#from save import RedisConnection, REDIS_URL
 
 class GameManager():
     """Holds games for all players, rutes and manages them"""
 
     def __init__(self):
-        self.redis = RedisConnection(REDIS_URL)
-        self.user_list = self.redis.get_all_games()
+        # self.redis = RedisConnection(REDIS_URL)
+        self.user_list = {}
 
     def merge_messages(self, messages):
-        """
+        """self.user_list = {}
         Takes a list of messages
         Merges every subsequent message to one player, into bigger message
         """
@@ -479,8 +479,8 @@ class GameManager():
                     else:
                         messages_to_send.append(OutMessage(
                             'Type /start to enter the game', chat_id, player_id))
-                    if player_game:
-                        self.redis.save_game(chat_id, player_game)
+                    # if player_game:
+                    #     self.redis.save_game(chat_id, player_game)
             return self.merge_messages(messages_to_send)
         except:
             print("Some went wrong")
