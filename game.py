@@ -204,24 +204,27 @@ class Game:
                 self.enqueue_message("You've lost half of your gold, while running away", self._chat_id, self._player_id)
                 self.playerchar.set_gold(self.playerchar.get_gold()/2)
                 self.enqueue_message(DialogMessage('base').get_message(), self._chat_id, self._player_id)
+
     def create_enemy_list(self, lvl):
         """
         Enemy spawn rules
         Returns list of enemies
         """
         enemy_list = []
-        monster = (5, 10, 20)
-        g_monster = (10, 20, 30)
+        monster = (10, 20, 30)
+        g_monster = (20, 30, 40)
+        enemies_count = lvl // 10 + 1
+
 
         for step in g_monster:
             ind = g_monster.index(step)
-            if lvl >= step and len(enemy_list) < 3:
+            if lvl >= step and len(enemy_list) < enemies_count:
                 if self.roll(4 - ind):
                     enemy_list.append(GreaterMonster(lvl))
 
         for step in monster:
             ind = monster.index(step)
-            if lvl >= step and len(enemy_list) < 3:
+            if lvl >= step and len(enemy_list) < enemies_count:
                 if self.roll(4 - ind):
                     enemy_list.append(Monster(lvl))
         if enemy_list == []:
@@ -401,11 +404,14 @@ class Game:
 # TODO: item sets
 # TODO: initiative
 
+from save import RedisConnection, REDIS_URL
+
 class GameManager():
     """Holds games for all players, rutes and manages them"""
 
     def __init__(self):
-        self.user_list = dict()
+        self.redis = RedisConnection(REDIS_URL)
+        self.user_list = self.redis.get_all_games()
 
     def merge_messages(self, messages):
         """
@@ -426,13 +432,14 @@ class GameManager():
         return result
 
     def generate_replays(self, update):
+        messages_to_send = []
         try:
-            messages_to_send = []
             for msg in update:
                 new_message = Message(msg['message'])
                 if new_message.get_type() != 'text':
                     pass
                 else:
+                    player_game = None
                     player_id = new_message.get_user_id()
                     chat_id = new_message.get_chat_id()
                     content = new_message.get_content()
@@ -472,6 +479,8 @@ class GameManager():
                     else:
                         messages_to_send.append(OutMessage(
                             'Type /start to enter the game', chat_id, player_id))
+                    if player_game:
+                        self.redis.save_game(chat_id, player_game)
             return self.merge_messages(messages_to_send)
         except:
             print("Some went wrong")
