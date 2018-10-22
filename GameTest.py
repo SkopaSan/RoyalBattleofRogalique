@@ -1,12 +1,12 @@
 from game import Game, OutMessage
 from events import DialogMessage
-import statistics
+import statistics, math
 number_of_tests = 1
 #char_class = "Mage"
 #char_class = "Rogue"
 char_class = "Warrior"
 
-print_rep = False
+print_rep = True
 
 class MyMessageTest:
     def __init__(self, text):
@@ -147,10 +147,20 @@ def main():
                 text = "Y"
             elif game._game_state == "Battle Choice":
                 text = "Y"
+                num_of_enemies = len(game.enemies)
+                print("Number of targets: ", num_of_enemies)
+                for target in range(len(game.enemies)):
+                    print("HOPE MOBA:", game.enemies[target]._maxhp, "Def mobov: ",game.enemies[target].get_stats()["DEF"] ,1 / math.sqrt(game.enemies[target].get_armour()/50 + 1))
+                #print("HOPE MOBA:", game.enemies[0]._maxhp)
+
+
+                #print(game.create_enemy_list(player.get_lvl()))
                 #print(game.battle_choice().enemies)
             elif game._game_state == "Item Choice":
                 text = "E"
+
                 # print(game.item.get_bonus_attack())
+                #print(Game(chat_id=1, player_id=1).enemies)
                 item = game.playerchar.get_inventory()[game.item.get_type()]
                 if item is not None:
                     compare(game)
