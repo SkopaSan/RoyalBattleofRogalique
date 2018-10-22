@@ -146,11 +146,17 @@ def main():
                     buy_potion(game)
                 text = "Y"
             elif game._game_state == "Battle Choice":
+                sum_ehp = 0
                 text = "Y"
                 num_of_enemies = len(game.enemies)
                 print("Number of targets: ", num_of_enemies)
                 for target in range(len(game.enemies)):
-                    print("HOPE MOBA:", game.enemies[target]._maxhp, "Def mobov: ",game.enemies[target].get_stats()["DEF"] ,1 / math.sqrt(game.enemies[target].get_armour()/50 + 1))
+                    print("HOPE MOBA:", game.enemies[target]._maxhp, "Def mobov: ",game.enemies[target].get_stats()["DEF"] ,game.enemies[target].get_armour())
+                    ehp = game.enemies[target]._maxhp / (1 - game.enemies[target].get_stats()["DEF"])
+                    print("EHP: ", ehp)
+                    sum_ehp += ehp
+                print(sum_ehp)
+
                 #print("HOPE MOBA:", game.enemies[0]._maxhp)
 
 
