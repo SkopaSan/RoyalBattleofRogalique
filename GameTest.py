@@ -1,12 +1,12 @@
 from game import Game, OutMessage
 from events import DialogMessage
 import statistics, math
-number_of_tests = 1
+number_of_tests = 10
 #char_class = "Mage"
-#char_class = "Rogue"
-char_class = "Warrior"
+char_class = "Rogue"
+#char_class = "Warrior"
 
-print_rep = True
+print_rep = False
 
 class MyMessageTest:
     def __init__(self, text):
@@ -131,14 +131,17 @@ def compare(game):
     #print(replays[0].text)
 #def monster_cheking(game):
     #print()
+
 def main():
     get_replay("/start")
     lvllist = []
+    mob_reject_count = 0
+    mob_reject_list = []
     for _ in range(number_of_tests):
         get_replay(char_class)
         game = game_manager.user_list[1]
         player = game.get_playerchar()
-        while player.is_alive() and player.get_lvl() < 100:
+        while player.is_alive() and player.get_lvl() < 50 and mob_reject_count < 10:
             # #text = input()
             # get_replay(text)
             if game._game_state == "Base":
@@ -147,31 +150,41 @@ def main():
                 text = "Y"
             elif game._game_state == "Battle Choice":
                 sum_ehp = 0
-                text = "Y"
                 num_of_enemies = len(game.enemies)
-                print("Number of targets: ", num_of_enemies)
+                monster_dmg = []
+                num_of_hits_list = []
                 for target in range(len(game.enemies)):
-                    print("HOPE MOBA:", game.enemies[target]._maxhp, "Def mobov: ",game.enemies[target].get_stats()["DEF"] ,game.enemies[target].get_armour())
                     ehp = game.enemies[target]._maxhp / (1 - game.enemies[target].get_stats()["DEF"])
-                    print("EHP: ", ehp)
+                    mindmg = (player.get_attack_stat() * 0.9) - (player.get_attack_stat() * 0.9 * game.enemies[target].get_stats()["DEF"])
+                    num_of_hits = math.ceil(game.enemies[target]._maxhp / mindmg)
+                    num_of_hits_list.append(num_of_hits)
+                    monster_max_dmg = (game.enemies[target].get_attack_stat() * 1.1) - (game.enemies[target].get_attack_stat() * 1.1 * player.get_stats()["DEF"])
+                    monster_dmg.append(monster_max_dmg)
                     sum_ehp += ehp
-                print(sum_ehp)
-
-                #print("HOPE MOBA:", game.enemies[0]._maxhp)
-
-
-                #print(game.create_enemy_list(player.get_lvl()))
-                #print(game.battle_choice().enemies)
+                hope = player.get_current_hp()
+                for i in range(num_of_enemies):
+                    for g in range(i, num_of_enemies):
+                        hope -= num_of_hits_list[i] * monster_dmg[g]
+                if hope < 1:
+                    text = "N"
+                    mob_reject_count += 1
+                else:
+                    text = "Y"
+                    if mob_reject_count != 0:
+                        mob_reject_list.append(mob_reject_count)
+                    mob_reject_count = 0
             elif game._game_state == "Item Choice":
                 text = "E"
-
-                # print(game.item.get_bonus_attack())
-                #print(Game(chat_id=1, player_id=1).enemies)
                 item = game.playerchar.get_inventory()[game.item.get_type()]
                 if item is not None:
                     compare(game)
             get_replay(text)
             lvl = player.get_lvl()
+        else:
+            #mob_reject_count_all.a
+            get_replay("/restart")
+            get_replay("/start")
+
         #print(count)
         lvllist.append(lvl)
     print(lvllist)
@@ -180,6 +193,13 @@ def main():
     print("Max level: ", max(lvllist))
     print("Average level: ", sum(lvllist)/number_of_tests)
     print("Median: ", statistics.median(lvllist))
+    if mob_reject_list is not None:
+        mob_reject_list.append(mob_reject_count)
+        print("Reject list: ", mob_reject_list)
+        print("Max rejects: ", max(mob_reject_list))
+        print("Avg rejects: ", sum(mob_reject_list) / float(len(mob_reject_list)))
+        print("Median rejects : ", statistics.median(mob_reject_list))
+
 if __name__ == '__main__':
     main()
 
